@@ -1,0 +1,37 @@
+image: registry.gitlab.antimatter-studios.com/antimatter-studios/kubernetes-gitlab-deployer/image:531
+
+services:
+  - docker:dind
+
+before_script:
+  - docker info
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_HOST: tcp://localhost:2375
+  NAMESPACE: mail-server
+  NAME: redis
+  REPLICAS: 1
+
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  script:
+    - echo ${CI_KUBECONFIG} | base64 -d > $PWD/kubeconfig
+    - export KUBECONFIG=$PWD/kubeconfig
+    - kubectl get pods --all-namespaces
+    - kubectl -n ${NAMESPACE} scale --replicas=0 deployment/${NAME} || true
+    - kubectl -n ${NAMESPACE} get deployments
+    - helm template
+      -f $PWD/values.yaml
+      --set name=${NAME}
+      --set namespace=${NAMESPACE}
+      $PWD/kubernetes | kubectl apply -f -
+    - kubectl -n ${NAMESPACE} scale --replicas=${REPLICAS} deployment/${NAME}
+    - kubectl -n ${NAMESPACE} get deployments
+
+
+
+
