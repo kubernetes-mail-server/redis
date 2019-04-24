@@ -35,5 +35,5 @@ spec:
     role: {{ .Values.name }}
   ports:
     - name: {{ .Values.name }}
-      port: {{ .Values.redis_port }}
+      port: {{ .Values.port }}
       targetPort: {{ .Values.port }}
