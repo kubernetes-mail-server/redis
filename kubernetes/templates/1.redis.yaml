@@ -15,9 +15,12 @@ spec:
         - name: {{ .Values.name }}
           image: redis:alpine
           imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: services-info
           ports:
             - name: {{ .Values.name }}
-              containerPort: {{ .Values.redis_port }}
+              containerPort: {{ .Values.port }}
               protocol: TCP
 ---
 
@@ -33,4 +36,4 @@ spec:
   ports:
     - name: {{ .Values.name }}
       port: {{ .Values.redis_port }}
-      targetPort: {{ .Values.redis_port }}
+      targetPort: {{ .Values.port }}

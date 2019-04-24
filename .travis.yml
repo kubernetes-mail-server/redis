@@ -34,9 +34,9 @@ jobs:
         - kubectl scale --replicas=0 deployment/${NAME} || true
         - kubectl get deployments
         - helm template
-            -f $PWD/values.yaml
             --set name=${NAME}
             --set namespace=${NAMESPACE}
+            --set port=$(kubectl get cm services-info -o=jsonpath="{.data.REDIS_PORT}")
             $PWD/kubernetes | kubectl apply -f -
         - kubectl scale --replicas=${REPLICAS} deployment/${NAME}
         - kubectl get deployments
